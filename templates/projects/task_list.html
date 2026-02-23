@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Tasks - JK Client Desk{% endblock %}
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h1 class="page-title">Tasks</h1>
+        <p class="page-subtitle">Track all tasks across your projects.</p>
+    </div>
+    <select class="form-select form-select-sm" style="width:auto" onchange="window.location='?project='+this.value">
+        <option value="">All Projects</option>
+        {% for p in projects %}
+        <option value="{{ p.pk }}" {% if selected_project and selected_project.pk == p.pk %}selected{% endif %}>
+            {{ p.project_name }}
+        </option>
+        {% endfor %}
+    </select>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% for task in tasks %}
+        <div class="task-item {% if task.is_completed %}task-done{% endif %}">
+            <i class="fas {% if task.is_completed %}fa-check-circle text-success{% else %}fa-circle text-muted{% endif %} fa-lg me-3"></i>
+            <div class="flex-grow-1">
+                <div class="d-flex justify-content-between">
+                    <div class="task-title">{{ task.title }}</div>
+                    <small class="text-muted">{{ task.project.project_name }}</small>
+                </div>
+                {% if task.description %}<div class="task-desc text-muted small mt-1">{{ task.description }}</div>{% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <i class="fas fa-tasks"></i>
+            <h4>No tasks found</h4>
+            <p class="text-muted">Tasks will appear here once added to your projects.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

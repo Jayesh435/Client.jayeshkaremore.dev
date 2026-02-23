@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard - JK Client Desk{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Admin Dashboard</h1>
+    <p class="page-subtitle">Manage all clients and projects from here.</p>
+</div>
+
+<!-- Stats -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="stats-icon bg-primary-soft"><i class="fas fa-users text-primary"></i></div>
+                <div class="stats-value">{{ total_clients }}</div>
+                <div class="stats-label">Total Clients</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="stats-icon bg-info-soft"><i class="fas fa-folder text-info"></i></div>
+                <div class="stats-value">{{ total_projects }}</div>
+                <div class="stats-label">Total Projects</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="stats-icon bg-success-soft"><i class="fas fa-check-circle text-success"></i></div>
+                <div class="stats-value">{{ completed_projects }}</div>
+                <div class="stats-label">Completed</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="stats-icon bg-warning-soft"><i class="fas fa-spinner text-warning"></i></div>
+                <div class="stats-value">{{ in_progress_projects }}</div>
+                <div class="stats-label">In Progress</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Projects Table -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">All Projects</h5>
+        <a href="/admin/projects/project/add/" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus me-1"></i> Add Project
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Project</th>
+                        <th>Client</th>
+                        <th>Status</th>
+                        <th>Progress</th>
+                        <th>Deadline</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for project in projects %}
+                    <tr>
+                        <td><strong>{{ project.project_name }}</strong></td>
+                        <td>{{ project.client.user.get_full_name|default:project.client.user.username }}</td>
+                        <td><span class="status-badge status-{{ project.status }}">{{ project.get_status_display }}</span></td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="progress flex-grow-1" style="height:6px">
+                                    <div class="progress-bar bg-primary" style="width:{{ project.progress_percentage }}%"></div>
+                                </div>
+                                <small>{{ project.progress_percentage }}%</small>
+                            </div>
+                        </td>
+                        <td>{% if project.deadline %}{{ project.deadline|date:"M d, Y" }}{% else %}-{% endif %}</td>
+                        <td>
+                            <a href="{% url 'project_detail' project.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+                            <a href="/admin/projects/project/{{ project.pk }}/change/" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center py-4 text-muted">No projects found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

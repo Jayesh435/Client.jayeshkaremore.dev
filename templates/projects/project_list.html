@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}My Projects - JK Client Desk{% endblock %}
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h1 class="page-title">My Projects</h1>
+        <p class="page-subtitle">Track all your ongoing and completed projects.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <select class="form-select form-select-sm" onchange="window.location='?status='+this.value" style="min-width:150px">
+            <option value="">All Status</option>
+            {% for val, label in status_choices %}
+            <option value="{{ val }}" {% if status_filter == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+
+<div class="row g-4">
+    {% for project in projects %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card project-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <span class="status-badge status-{{ project.status }}">{{ project.get_status_display }}</span>
+                    {% if project.deadline %}
+                    <small class="text-muted">
+                        <i class="fas fa-calendar me-1"></i>{{ project.deadline|date:"M d, Y" }}
+                    </small>
+                    {% endif %}
+                </div>
+                <h5 class="card-title mb-2">{{ project.project_name }}</h5>
+                <p class="card-text text-muted small mb-3">{{ project.description|truncatewords:20 }}</p>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <small class="text-muted">Progress</small>
+                        <small class="fw-bold">{{ project.progress_percentage }}%</small>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped bg-primary"
+                             style="width:{{ project.progress_percentage }}%"
+                             role="progressbar"></div>
+                    </div>
+                </div>
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <div class="small text-muted">Paid</div>
+                        <div class="fw-bold text-success">₹{{ project.amount_paid|floatformat:0 }}</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="small text-muted">Remaining</div>
+                        <div class="fw-bold text-danger">₹{{ project.remaining_balance|floatformat:0 }}</div>
+                    </div>
+                </div>
+                <a href="{% url 'project_detail' project.pk %}" class="btn btn-primary btn-sm w-100">
+                    <i class="fas fa-eye me-1"></i> View Details
+                </a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="empty-state">
+            <i class="fas fa-folder-open"></i>
+            <h4>No projects found</h4>
+            <p class="text-muted">No projects match your current filter.</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

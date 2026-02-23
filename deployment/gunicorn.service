@@ -1,0 +1,17 @@
+[Unit]
+Description=JK Client Portal Gunicorn Daemon
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/jk_client_portal
+ExecStart=/var/www/jk_client_portal/venv/bin/gunicorn \
+          --access-logfile - \
+          --workers 3 \
+          --bind unix:/run/gunicorn.sock \
+          jk_client_portal.wsgi:application
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

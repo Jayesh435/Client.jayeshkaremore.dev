@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}Payment Details - JK Client Desk{% endblock %}
+{% block content %}
+<div class="page-header">
+    <a href="{% url 'payment_list' %}" class="btn btn-sm btn-outline-secondary mb-3">
+        <i class="fas fa-arrow-left me-1"></i> Back
+    </a>
+    <h1 class="page-title">{{ project.project_name }} – Payments</h1>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="stats-icon bg-primary-soft"><i class="fas fa-rupee-sign text-primary"></i></div>
+                <div class="stats-value">₹{{ project.total_cost|floatformat:0 }}</div>
+                <div class="stats-label">Total Cost</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="stats-icon bg-success-soft"><i class="fas fa-check-circle text-success"></i></div>
+                <div class="stats-value">₹{{ project.amount_paid|floatformat:0 }}</div>
+                <div class="stats-label">Amount Paid</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="stats-icon bg-danger-soft"><i class="fas fa-exclamation-circle text-danger"></i></div>
+                <div class="stats-value">₹{{ project.remaining_balance|floatformat:0 }}</div>
+                <div class="stats-label">Remaining</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Payment History</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Method</th>
+                        <th>Transaction ID</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in payments %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td class="text-success fw-bold">₹{{ payment.amount|floatformat:2 }}</td>
+                        <td>{{ payment.payment_date|date:"M d, Y" }}</td>
+                        <td>{{ payment.get_payment_method_display }}</td>
+                        <td><code>{{ payment.transaction_id|default:"-" }}</code></td>
+                        <td>{{ payment.notes|default:"-" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center py-4 text-muted">No payments recorded yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

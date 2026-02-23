@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}Payments - JK Client Desk{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Payments</h1>
+    <p class="page-subtitle">Overview of all your payment transactions.</p>
+</div>
+
+<!-- Payment Summary Cards -->
+<div class="row g-4 mb-4">
+    {% for project in projects %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card payment-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h6 class="card-title mb-0">{{ project.project_name }}</h6>
+                    <span class="status-badge status-{{ project.status }}">{{ project.get_status_display }}</span>
+                </div>
+                <div class="payment-summary">
+                    <div class="payment-row">
+                        <span class="text-muted">Total</span>
+                        <strong>₹{{ project.total_cost|floatformat:0 }}</strong>
+                    </div>
+                    <div class="payment-row">
+                        <span class="text-muted">Paid</span>
+                        <strong class="text-success">₹{{ project.amount_paid|floatformat:0 }}</strong>
+                    </div>
+                    <div class="payment-row">
+                        <span class="text-muted">Due</span>
+                        <strong class="text-danger">₹{{ project.remaining_balance|floatformat:0 }}</strong>
+                    </div>
+                </div>
+                <div class="progress mt-3" style="height:6px">
+                    {% if project.total_cost > 0 %}
+                    <div class="progress-bar bg-success" style="width:{% widthratio project.amount_paid project.total_cost 100 %}%"></div>
+                    {% endif %}
+                </div>
+                <a href="{% url 'payment_detail' project.pk %}" class="btn btn-sm btn-outline-primary mt-3 w-100">
+                    View Details
+                </a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="empty-state">
+            <i class="fas fa-credit-card"></i>
+            <h4>No payment data</h4>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Recent Payments -->
+{% if payments %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Payment History</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Project</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Method</th>
+                        <th>Transaction ID</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in payments %}
+                    <tr>
+                        <td>{{ payment.project.project_name }}</td>
+                        <td class="text-success fw-bold">₹{{ payment.amount|floatformat:2 }}</td>
+                        <td>{{ payment.payment_date|date:"M d, Y" }}</td>
+                        <td>{{ payment.get_payment_method_display }}</td>
+                        <td><code>{{ payment.transaction_id|default:"-" }}</code></td>
+                        <td>{{ payment.notes|default:"-"|truncatewords:10 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
