@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard - JK Client Desk{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle">Welcome back! Here's an overview of your projects.</p>
+</div>
+
+{% if active_project %}
+<!-- Active Project Card -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card project-hero-card">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="status-badge status-{{ active_project.status }}">
+                                {{ active_project.get_status_display }}
+                            </span>
+                        </div>
+                        <h2 class="project-title mb-1">{{ active_project.project_name }}</h2>
+                        <p class="text-muted mb-3">{{ active_project.description|truncatewords:20 }}</p>
+                        <div class="d-flex gap-4 flex-wrap">
+                            {% if active_project.deadline %}
+                            <div class="stat-item">
+                                <i class="fas fa-calendar-alt text-warning me-1"></i>
+                                <span class="text-muted">Deadline:</span>
+                                <strong>{{ active_project.deadline|date:"M d, Y" }}</strong>
+                                {% if active_project.days_remaining is not None %}
+                                    {% if active_project.days_remaining > 0 %}
+                                        <span class="badge bg-warning ms-1">{{ active_project.days_remaining }} days left</span>
+                                    {% elif active_project.days_remaining == 0 %}
+                                        <span class="badge bg-danger ms-1">Due today!</span>
+                                    {% else %}
+                                        <span class="badge bg-danger ms-1">Overdue!</span>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            {% if active_project.live_url %}
+                            <div class="stat-item">
+                                <i class="fas fa-globe text-success me-1"></i>
+                                <a href="{{ active_project.live_url }}" target="_blank">View Live Site</a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <a href="{% url 'project_detail' active_project.pk %}" class="btn btn-primary">
+                            View Details <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+                <!-- Progress Bar -->
+                <div class="mt-4">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted">Progress</span>
+                        <strong>{{ active_project.progress_percentage }}%</strong>
+                    </div>
+                    <div class="progress progress-lg">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+                             role="progressbar"
+                             style="width: {{ active_project.progress_percentage }}%"
+                             aria-valuenow="{{ active_project.progress_percentage }}"
+                             aria-valuemin="0" aria-valuemax="100">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Row -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="stats-icon bg-success-soft">
+                    <i class="fas fa-rupee-sign text-success"></i>
+                </div>
+                <div class="stats-value">₹{{ active_project.amount_paid|floatformat:0 }}</div>
+                <div class="stats-label">Total Paid</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="stats-icon bg-danger-soft">
+                    <i class="fas fa-rupee-sign text-danger"></i>
+                </div>
+                <div class="stats-value">₹{{ active_project.remaining_balance|floatformat:0 }}</div>
+                <div class="stats-label">Remaining Balance</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="stats-icon bg-primary-soft">
+                    <i class="fas fa-tasks text-primary"></i>
+                </div>
+                <div class="stats-value">{{ active_project.tasks.count }}</div>
+                <div class="stats-label">Total Tasks</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endif %}
+
+<!-- All Projects -->
+<div class="row g-4">
+    {% for project in projects %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card project-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <span class="status-badge status-{{ project.status }}">{{ project.get_status_display }}</span>
+                    {% if project.deadline %}
+                    <small class="text-muted"><i class="fas fa-clock me-1"></i>{{ project.deadline|date:"M d" }}</small>
+                    {% endif %}
+                </div>
+                <h5 class="card-title mb-2">{{ project.project_name }}</h5>
+                <p class="card-text text-muted small mb-3">{{ project.description|truncatewords:15 }}</p>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <small class="text-muted">Progress</small>
+                        <small class="fw-bold">{{ project.progress_percentage }}%</small>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-primary" style="width:{{ project.progress_percentage }}%"></div>
+                    </div>
+                </div>
+                <a href="{% url 'project_detail' project.pk %}" class="btn btn-sm btn-outline-primary w-100">
+                    View Project
+                </a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="empty-state">
+            <i class="fas fa-folder-open"></i>
+            <h4>No projects yet</h4>
+            <p class="text-muted">Your projects will appear here once assigned.</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

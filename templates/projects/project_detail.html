@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% block title %}{{ project.project_name }} - JK Client Desk{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div class="d-flex align-items-center gap-3 mb-2">
+        <a href="{% url 'project_list' %}" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Back
+        </a>
+        <span class="status-badge status-{{ project.status }}">{{ project.get_status_display }}</span>
+    </div>
+    <h1 class="page-title">{{ project.project_name }}</h1>
+    {% if project.description %}<p class="page-subtitle">{{ project.description }}</p>{% endif %}
+</div>
+
+<!-- Progress -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="mb-0">Overall Progress</h6>
+            <span class="fw-bold fs-5">{{ project.progress_percentage }}%</span>
+        </div>
+        <div class="progress progress-lg">
+            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+                 style="width:{{ project.progress_percentage }}%" role="progressbar"></div>
+        </div>
+        <div class="row mt-3">
+            {% if project.start_date %}<div class="col-auto"><small class="text-muted">Start: </small><strong>{{ project.start_date|date:"M d, Y" }}</strong></div>{% endif %}
+            {% if project.deadline %}<div class="col-auto"><small class="text-muted">Deadline: </small><strong>{{ project.deadline|date:"M d, Y" }}</strong>
+                {% if project.days_remaining is not None %}
+                    {% if project.days_remaining > 0 %}<span class="badge bg-warning ms-1">{{ project.days_remaining }}d left</span>
+                    {% elif project.days_remaining == 0 %}<span class="badge bg-danger ms-1">Due today!</span>
+                    {% else %}<span class="badge bg-danger ms-1">Overdue!</span>{% endif %}
+                {% endif %}
+            </div>{% endif %}
+            {% if project.live_url %}<div class="col-auto"><a href="{{ project.live_url }}" target="_blank" class="btn btn-sm btn-success"><i class="fas fa-globe me-1"></i>Live Site</a></div>{% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Tasks -->
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-tasks me-2"></i>Tasks</h5>
+            </div>
+            <div class="card-body">
+                {% for task in tasks %}
+                <div class="task-item {% if task.is_completed %}task-done{% endif %}">
+                    <i class="fas {% if task.is_completed %}fa-check-circle text-success{% else %}fa-circle text-muted{% endif %} me-2"></i>
+                    <div>
+                        <div class="task-title">{{ task.title }}</div>
+                        {% if task.description %}<div class="task-desc text-muted small">{{ task.description }}</div>{% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted text-center py-3">No tasks yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Summary -->
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between">
+                <h5 class="mb-0"><i class="fas fa-credit-card me-2"></i>Payment Summary</h5>
+                <a href="{% url 'payment_detail' project.pk %}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body">
+                <div class="payment-summary">
+                    <div class="payment-row">
+                        <span>Total Cost</span>
+                        <strong>₹{{ project.total_cost|floatformat:2 }}</strong>
+                    </div>
+                    <div class="payment-row">
+                        <span>Amount Paid</span>
+                        <strong class="text-success">₹{{ project.amount_paid|floatformat:2 }}</strong>
+                    </div>
+                    <div class="payment-row border-top pt-2 mt-2">
+                        <span>Remaining</span>
+                        <strong class="text-danger">₹{{ project.remaining_balance|floatformat:2 }}</strong>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div class="progress" style="height:8px">
+                        {% if project.total_cost > 0 %}
+                        <div class="progress-bar bg-success"
+                             style="width:{% widthratio project.amount_paid project.total_cost 100 %}%"></div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Upload -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-paperclip me-2"></i>Files</h5>
+                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#uploadForm">
+                    <i class="fas fa-upload me-1"></i> Upload
+                </button>
+            </div>
+            <div class="collapse" id="uploadForm">
+                <div class="card-body border-bottom">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-5">
+                                <label class="form-label">File</label>
+                                <input type="file" name="file" class="form-control" required>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label">Description</label>
+                                <input type="text" name="description" class="form-control" placeholder="File description (optional)">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary w-100">Upload</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card-body">
+                {% for file in files %}
+                <div class="file-item">
+                    <div class="file-icon">
+                        <i class="fas fa-file"></i>
+                    </div>
+                    <div class="file-info">
+                        <div class="file-name">{{ file.filename }}</div>
+                        <div class="file-meta text-muted small">
+                            {{ file.get_uploaded_by_display }} &middot; {{ file.uploaded_at|date:"M d, Y" }}
+                            {% if file.description %} &middot; {{ file.description }}{% endif %}
+                        </div>
+                    </div>
+                    <a href="{{ file.file.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-download"></i>
+                    </a>
+                </div>
+                {% empty %}
+                <p class="text-muted text-center py-3">No files uploaded yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
