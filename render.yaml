@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: jk-client-portal
+    runtime: docker
+    plan: free
+    autoDeploy: true
+    healthCheckPath: /accounts/login/
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: "jk-client-portal.onrender.com"
+      - key: DB_ENGINE
+        value: "django.db.backends.postgresql"
+      - key: DB_NAME
+        fromDatabase:
+          name: jk-client-portal-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: jk-client-portal-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: jk-client-portal-db
+          property: password
+      - key: DB_HOST
+        fromDatabase:
+          name: jk-client-portal-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: jk-client-portal-db
+          property: port
+      - key: SECRET_KEY
+        generateValue: true
+
+  - type: pserv
+    name: jk-client-portal-db
+    plan: free
+    databaseName: jk_client_portal
+    user: jk_client_portal
