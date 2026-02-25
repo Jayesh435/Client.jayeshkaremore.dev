@@ -9,7 +9,7 @@ services:
       - key: DEBUG
         value: "False"
       - key: ALLOWED_HOSTS
-        value: "jk-client-portal.onrender.com"
+        value: ".onrender.com,client.jayeshkaremore.dev"
       - key: DB_ENGINE
         value: "django.db.backends.postgresql"
       - key: DB_NAME
