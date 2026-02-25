@@ -80,7 +80,7 @@
                 <div class="stats-icon bg-success-soft">
                     <i class="fas fa-rupee-sign text-success"></i>
                 </div>
-                <div class="stats-value">₹{{ active_project.amount_paid|floatformat:0 }}</div>
+                <div class="stats-value">₹{{ active_project.amount_paid_calc|floatformat:0 }}</div>
                 <div class="stats-label">Total Paid</div>
             </div>
         </div>
@@ -91,7 +91,7 @@
                 <div class="stats-icon bg-danger-soft">
                     <i class="fas fa-rupee-sign text-danger"></i>
                 </div>
-                <div class="stats-value">₹{{ active_project.remaining_balance|floatformat:0 }}</div>
+                <div class="stats-value">₹{{ active_project.remaining_balance_calc|floatformat:0 }}</div>
                 <div class="stats-label">Remaining Balance</div>
             </div>
         </div>

@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.db.models import Sum, F, DecimalField
+from django.db.models.functions import Coalesce
 from projects.models import Project
 from accounts.models import Client
 
@@ -27,7 +29,10 @@ def dashboard(request):
     except Client.DoesNotExist:
         return render(request, 'core/no_profile.html')
 
-    projects = client.projects.all()
+    projects = client.projects.annotate(
+        amount_paid_calc=Coalesce(Sum('payments__amount'), 0, output_field=DecimalField(max_digits=10, decimal_places=2)),
+        remaining_balance_calc=F('total_cost') - Coalesce(Sum('payments__amount'), 0, output_field=DecimalField(max_digits=10, decimal_places=2)),
+    )
     context = {
         'client': client,
         'projects': projects,

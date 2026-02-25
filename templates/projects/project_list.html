@@ -45,11 +45,11 @@
                 <div class="row g-2 mb-3">
                     <div class="col-6">
                         <div class="small text-muted">Paid</div>
-                        <div class="fw-bold text-success">₹{{ project.amount_paid|floatformat:0 }}</div>
+                        <div class="fw-bold text-success">₹{{ project.amount_paid_calc|floatformat:0 }}</div>
                     </div>
                     <div class="col-6">
                         <div class="small text-muted">Remaining</div>
-                        <div class="fw-bold text-danger">₹{{ project.remaining_balance|floatformat:0 }}</div>
+                        <div class="fw-bold text-danger">₹{{ project.remaining_balance_calc|floatformat:0 }}</div>
                     </div>
                 </div>
                 <a href="{% url 'project_detail' project.pk %}" class="btn btn-primary btn-sm w-100">

@@ -23,16 +23,16 @@
                     </div>
                     <div class="payment-row">
                         <span class="text-muted">Paid</span>
-                        <strong class="text-success">₹{{ project.amount_paid|floatformat:0 }}</strong>
+                        <strong class="text-success">₹{{ project.amount_paid_calc|floatformat:0 }}</strong>
                     </div>
                     <div class="payment-row">
                         <span class="text-muted">Due</span>
-                        <strong class="text-danger">₹{{ project.remaining_balance|floatformat:0 }}</strong>
+                        <strong class="text-danger">₹{{ project.remaining_balance_calc|floatformat:0 }}</strong>
                     </div>
                 </div>
                 <div class="progress mt-3" style="height:6px">
                     {% if project.total_cost > 0 %}
-                    <div class="progress-bar bg-success" style="width:{% widthratio project.amount_paid project.total_cost 100 %}%"></div>
+                    <div class="progress-bar bg-success" style="width:{% widthratio project.amount_paid_calc project.total_cost 100 %}%"></div>
                     {% endif %}
                 </div>
                 <a href="{% url 'payment_detail' project.pk %}" class="btn btn-sm btn-outline-primary mt-3 w-100">

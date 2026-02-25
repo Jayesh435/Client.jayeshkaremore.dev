@@ -7,10 +7,7 @@ from .forms import ProfileUpdateForm
 
 @login_required
 def profile(request):
-    try:
-        client = request.user.client_profile
-    except Client.DoesNotExist:
-        client = None
+    client, _ = Client.objects.get_or_create(user=request.user)
 
     if request.method == 'POST':
         form = ProfileUpdateForm(request.POST, request.FILES, instance=client, user=request.user)

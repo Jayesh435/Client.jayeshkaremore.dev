@@ -75,18 +75,18 @@
                     </div>
                     <div class="payment-row">
                         <span>Amount Paid</span>
-                        <strong class="text-success">₹{{ project.amount_paid|floatformat:2 }}</strong>
+                        <strong class="text-success">₹{{ amount_paid|floatformat:2 }}</strong>
                     </div>
                     <div class="payment-row border-top pt-2 mt-2">
                         <span>Remaining</span>
-                        <strong class="text-danger">₹{{ project.remaining_balance|floatformat:2 }}</strong>
+                        <strong class="text-danger">₹{{ remaining_balance|floatformat:2 }}</strong>
                     </div>
                 </div>
                 <div class="mt-3">
                     <div class="progress" style="height:8px">
                         {% if project.total_cost > 0 %}
                         <div class="progress-bar bg-success"
-                             style="width:{% widthratio project.amount_paid project.total_cost 100 %}%"></div>
+                             style="width:{% widthratio amount_paid project.total_cost 100 %}%"></div>
                         {% endif %}
                     </div>
                 </div>

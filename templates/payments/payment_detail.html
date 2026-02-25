@@ -22,7 +22,7 @@
         <div class="card stats-card">
             <div class="card-body">
                 <div class="stats-icon bg-success-soft"><i class="fas fa-check-circle text-success"></i></div>
-                <div class="stats-value">₹{{ project.amount_paid|floatformat:0 }}</div>
+                <div class="stats-value">₹{{ amount_paid|floatformat:0 }}</div>
                 <div class="stats-label">Amount Paid</div>
             </div>
         </div>
@@ -31,7 +31,7 @@
         <div class="card stats-card">
             <div class="card-body">
                 <div class="stats-icon bg-danger-soft"><i class="fas fa-exclamation-circle text-danger"></i></div>
-                <div class="stats-value">₹{{ project.remaining_balance|floatformat:0 }}</div>
+                <div class="stats-value">₹{{ remaining_balance|floatformat:0 }}</div>
                 <div class="stats-label">Remaining</div>
             </div>
         </div>

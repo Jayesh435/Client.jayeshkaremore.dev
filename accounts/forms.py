@@ -25,6 +25,8 @@ class ProfileUpdateForm(forms.ModelForm):
 
     def save(self, commit=True):
         client = super().save(commit=False)
+        if self.user and not client.pk:
+            client.user = self.user
         if self.user:
             self.user.first_name = self.cleaned_data['first_name']
             self.user.last_name = self.cleaned_data['last_name']

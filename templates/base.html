@@ -23,8 +23,8 @@
             <div class="brand-name">JK Client Desk</div>
         </div>
         <div class="sidebar-user">
-            {% if user.client_profile.profile_picture %}
-                <img src="{{ user.client_profile.profile_picture.url }}" alt="Profile" class="user-avatar">
+            {% if sidebar_client_profile and sidebar_client_profile.profile_picture %}
+                <img src="{{ sidebar_client_profile.profile_picture.url }}" alt="Profile" class="user-avatar">
             {% else %}
                 <div class="user-avatar-placeholder">
                     <i class="fas fa-user"></i>
@@ -81,10 +81,13 @@
             </li>
             {% endif %}
             <li class="nav-item mt-auto">
-                <a href="{% url 'logout' %}" class="nav-link text-danger">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </a>
+                <form method="post" action="{% url 'logout' %}" class="m-0 p-0">
+                    {% csrf_token %}
+                    <button type="submit" class="nav-link text-danger border-0 bg-transparent w-100 text-start">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </button>
+                </form>
             </li>
         </ul>
     </nav>

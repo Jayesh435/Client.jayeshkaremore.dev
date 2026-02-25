@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models import Sum, F, DecimalField
+from django.db.models.functions import Coalesce
 from .models import Project, Task, FileUpload
 from .forms import FileUploadForm
 from accounts.models import Client
@@ -19,6 +21,11 @@ def project_list(request):
         projects = Project.objects.all().select_related('client__user')
     else:
         projects = get_client_projects(request.user)
+
+    projects = projects.annotate(
+        amount_paid_calc=Coalesce(Sum('payments__amount'), 0, output_field=DecimalField(max_digits=10, decimal_places=2)),
+        remaining_balance_calc=F('total_cost') - Coalesce(Sum('payments__amount'), 0, output_field=DecimalField(max_digits=10, decimal_places=2)),
+    )
 
     status_filter = request.GET.get('status', '')
     if status_filter:
@@ -41,6 +48,8 @@ def project_detail(request, pk):
 
     tasks = project.tasks.all()
     files = project.files.all()
+    amount_paid = project.payments.aggregate(total=Sum('amount'))['total'] or 0
+    remaining_balance = project.total_cost - amount_paid
     upload_form = FileUploadForm()
 
     if request.method == 'POST':
@@ -58,6 +67,8 @@ def project_detail(request, pk):
         'tasks': tasks,
         'files': files,
         'upload_form': upload_form,
+        'amount_paid': amount_paid,
+        'remaining_balance': remaining_balance,
     })
 
 
