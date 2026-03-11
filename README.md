@@ -39,4 +39,6 @@ This project now includes Docker and Render Blueprint files:
   - `python manage.py collectstatic --noinput`
   - `gunicorn jk_client_portal.wsgi:application --bind 0.0.0.0:$PORT`
 - SQLite is not recommended for Render production. Use PostgreSQL.
+- If you use Neon, set `DATABASE_URL` in Render environment variables
+	(format: `postgresql://USER:PASSWORD@HOST:5432/DBNAME`).
 - Update `ALLOWED_HOSTS` with your final Render/custom domain.
