@@ -7,18 +7,46 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+def _normalize_host(value: str) -> str:
+    host = value.strip()
+    if not host:
+        return ''
+
+    # Accept common env formats like https://example.com or example.com/path.
+    if host.startswith('http://') or host.startswith('https://'):
+        parsed = urlparse(host)
+        host = parsed.netloc or parsed.path
+
+    host = host.split('/')[0].strip().lower()
+
+    # Convert wildcard form *.example.com to Django-compatible .example.com.
+    if host.startswith('*.'):
+        host = f".{host[2:]}"
+
+    # Strip :port from hostnames (IPv6 literals are not expected here).
+    if ':' in host and host.count(':') == 1:
+        maybe_host, maybe_port = host.rsplit(':', 1)
+        if maybe_port.isdigit():
+            host = maybe_host
+
+    return host
+
+
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-key-change-in-production')
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
-ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.environ.get(
-        'ALLOWED_HOSTS',
-        'localhost,127.0.0.1,client.jayeshkaremore.dev'
-    ).split(',')
-    if host.strip()
-]
 
-render_external_hostname = os.environ.get('RENDER_EXTERNAL_HOSTNAME', '').strip()
+raw_allowed_hosts = os.environ.get(
+    'ALLOWED_HOSTS',
+    'localhost,127.0.0.1,client.jayeshkaremore.dev'
+)
+ALLOWED_HOSTS = []
+for host in raw_allowed_hosts.split(','):
+    normalized = _normalize_host(host)
+    if normalized and normalized not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(normalized)
+
+render_external_hostname = _normalize_host(os.environ.get('RENDER_EXTERNAL_HOSTNAME', ''))
 if render_external_hostname and render_external_hostname not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(render_external_hostname)
 
